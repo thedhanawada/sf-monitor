@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-Monitor Salesforce governor limits from the command line.
+Salesforce monitoring toolkit for governor limits, flows, performance, and debugging.
 
 ## Prerequisites
 
@@ -56,6 +56,14 @@ sf-monitor monitor --org production --continuous
 - Email limits
 - Processing limits (Apex, workflows)
 - Platform events
+
+## Coming Soon
+
+- Flow debugging and tracing
+- Performance monitoring
+- Error tracking
+- Salesforce CLI plugin
+- VS Code extension
 
 ## Alerts
 
