@@ -70,7 +70,7 @@ ${chalk.blue('For sandbox orgs:')}
   ${this.sfCommand} org login web --instance-url https://test.salesforce.com
 
 ${chalk.blue('Then run:')}
-  limitguard setup`);
+  sf-monitor setup`);
       }
       throw new Error(`Failed to get authenticated orgs: ${error.message}`);
     }
@@ -140,7 +140,7 @@ ${chalk.white('With custom domain:')}
   ${this.sfCommand} org login web --instance-url https://yourcompany.my.salesforce.com
 
 ${chalk.blue('After authentication, run:')}
-  limitguard setup
+  sf-monitor setup
 `;
   }
 }

@@ -4,11 +4,11 @@
   "description": "Salesforce monitoring toolkit - governor limits, flows, performance, and debugging tools",
   "main": "index.js",
   "bin": {
-    "sf-monitor": "./bin/limitguard.js"
+    "sf-monitor": "./bin/sf-monitor.js"
   },
   "scripts": {
-    "start": "node bin/limitguard.js",
-    "dev": "node --watch bin/limitguard.js",
+    "start": "node bin/sf-monitor.js",
+    "dev": "node --watch bin/sf-monitor.js",
     "test": "jest",
     "lint": "eslint src/ bin/",
     "format": "prettier --write src/ bin/"
@@ -24,7 +24,7 @@
     "apex",
     "performance"
   ],
-  "author": "LimitGuard Contributors",
+  "author": "sf-monitor Contributors",
   "license": "MIT",
   "repository": {
     "type": "git",

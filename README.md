@@ -1,4 +1,4 @@
-# LimitGuard
+# sf-monitor
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
@@ -13,7 +13,7 @@ Monitor Salesforce governor limits from the command line.
 ## Install
 
 ```bash
-npm install -g limitguard
+npm install -g sf-monitor
 ```
 
 ## Setup
@@ -27,7 +27,7 @@ sf org login web --instance-url https://test.salesforce.com
 
 Then run setup:
 ```bash
-limitguard setup
+sf-monitor setup
 ```
 
 This will show your authenticated orgs and let you choose one to monitor.
@@ -36,17 +36,17 @@ This will show your authenticated orgs and let you choose one to monitor.
 
 ```bash
 # Check current limits
-limitguard status
+sf-monitor status
 
 # Monitor once and exit
-limitguard monitor
+sf-monitor monitor
 
 # Monitor continuously 
-limitguard monitor --continuous
+sf-monitor monitor --continuous
 
 # Monitor specific org
-limitguard status --org my-sandbox
-limitguard monitor --org production --continuous
+sf-monitor status --org my-sandbox
+sf-monitor monitor --org production --continuous
 ```
 
 ## What it monitors
@@ -73,7 +73,7 @@ Configure during setup:
 
 ## Authentication
 
-LimitGuard uses your existing Salesforce CLI authentication. No passwords or tokens stored locally.
+sf-monitor uses your existing Salesforce CLI authentication. No passwords or tokens stored locally.
 
 ## License
 

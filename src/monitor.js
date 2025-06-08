@@ -31,7 +31,7 @@ class LimitsMonitor {
         winston.format.json()
       ),
       transports: [
-        new winston.transports.File({ filename: 'limitguard.log' }),
+        new winston.transports.File({ filename: 'sf-monitor.log' }),
         new winston.transports.Console({
           format: winston.format.simple(),
           silent: this.options.quiet

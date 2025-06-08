@@ -9,7 +9,7 @@ const ConfigManager = require('../src/config');
 const program = new Command();
 
 program
-  .name('limitguard')
+  .name('sf-monitor')
   .description('Real-time Salesforce Governor Limits Monitor CLI')
   .version(version);
 
@@ -33,7 +33,7 @@ program
 
 program
   .command('config')
-  .description('Manage LimitGuard configuration')
+  .description('Manage sf-monitor configuration')
   .option('--set <key=value>', 'Set configuration value')
   .option('--get <key>', 'Get configuration value')
   .option('--list', 'List all configuration')
@@ -60,12 +60,12 @@ program
 
 program
   .command('setup')
-  .description('Interactive setup for LimitGuard')
+  .description('Interactive setup for sf-monitor')
   .action(async () => {
     try {
       const config = new ConfigManager();
       await config.interactiveSetup();
-      console.log(chalk.green('✓ LimitGuard setup completed!'));
+      console.log(chalk.green('✓ sf-monitor setup completed!'));
     } catch (error) {
       console.error(chalk.red('Error:'), error.message);
       process.exit(1);

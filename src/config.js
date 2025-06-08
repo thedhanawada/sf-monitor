@@ -7,7 +7,7 @@ const SFAuthManager = require('./sfauth');
 
 class ConfigManager {
   constructor() {
-    this.configDir = path.join(os.homedir(), '.limitguard');
+    this.configDir = path.join(os.homedir(), '.sf-monitor');
     this.configFile = path.join(this.configDir, 'config.json');
     this.orgsFile = path.join(this.configDir, 'orgs.json');
     this.sfAuth = new SFAuthManager();
@@ -109,7 +109,7 @@ class ConfigManager {
       orgAlias = config.defaultOrg;
       
       if (!orgAlias) {
-        throw new Error('No org specified and no default org configured. Use --org or run "limitguard setup"');
+        throw new Error('No org specified and no default org configured. Use --org or run "sf-monitor setup"');
       }
     }
 
@@ -146,7 +146,7 @@ class ConfigManager {
   }
 
   async interactiveSetup() {
-    console.log(chalk.blue('Welcome to LimitGuard Interactive Setup\n'));
+    console.log(chalk.blue('Welcome to sf-monitor Interactive Setup\n'));
 
     try {
       // Get authenticated orgs from SF CLI
@@ -163,7 +163,7 @@ class ConfigManager {
         {
           type: 'list',
           name: 'selectedOrg',
-          message: 'Select an org to use with LimitGuard:',
+          message: 'Select an org to use with sf-monitor:',
           choices: authenticatedOrgs.map(org => ({
             name: `${org.alias || org.username} (${org.username})`,
             value: org
@@ -193,7 +193,7 @@ class ConfigManager {
         {
           type: 'confirm',
           name: 'setAsDefault',
-          message: 'Set this org as the default for LimitGuard?',
+          message: 'Set this org as the default for sf-monitor?',
           default: true
         },
         {
@@ -252,7 +252,7 @@ class ConfigManager {
       console.log(chalk.green('\n✅ Configuration saved successfully!'));
       console.log(chalk.blue(`Selected org: ${answers.selectedOrg.username}`));
       console.log(chalk.blue(`Default org: ${answers.setAsDefault ? 'Yes' : 'No'}`));
-      console.log(chalk.blue(`\nTo start monitoring, run: ${chalk.bold('limitguard monitor')}`));
+      console.log(chalk.blue(`\nTo start monitoring, run: ${chalk.bold('sf-monitor monitor')}`));
       
     } catch (error) {
       console.error(chalk.red('\nSetup failed:'));
@@ -416,7 +416,7 @@ class ConfigManager {
     await alertManager.sendAlert({
       type: 'test',
       severity: 'info',
-      message: 'This is a test alert from LimitGuard',
+      message: 'This is a test alert from sf-monitor',
       timestamp: new Date().toISOString()
     });
   }
