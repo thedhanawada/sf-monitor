@@ -1,28 +1,27 @@
 {
-  "name": "sf-monitor",
+  "name": "sf-monitor-monorepo",
   "version": "1.5.0",
-  "description": "Salesforce monitoring toolkit - governor limits, flows, performance, and debugging tools",
-  "main": "index.js",
-  "bin": {
-    "sf-monitor": "./bin/sf-monitor.js"
-  },
+  "description": "Salesforce monitoring toolkit - CLI and VS Code extension",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "start": "node bin/sf-monitor.js",
-    "dev": "node --watch bin/sf-monitor.js",
-    "test": "jest",
-    "lint": "eslint src/ bin/",
-    "format": "prettier --write src/ bin/"
+    "build": "npm run build --workspaces",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "npm run clean --workspaces",
+    "cli:start": "npm run start --workspace=packages/cli",
+    "vscode:compile": "npm run compile --workspace=packages/vscode",
+    "vscode:watch": "npm run watch --workspace=packages/vscode",
+    "vscode:package": "npm run package --workspace=packages/vscode"
   },
   "keywords": [
     "salesforce",
     "governor-limits",
     "monitoring",
     "cli",
-    "devops",
-    "api-limits",
-    "soql",
-    "apex",
-    "performance"
+    "vscode"
   ],
   "author": "sf-monitor Contributors",
   "license": "MIT",
@@ -34,31 +33,10 @@
     "url": "https://github.com/thedhanawada/sf-monitor/issues"
   },
   "homepage": "https://github.com/thedhanawada/sf-monitor#readme",
-  "dependencies": {
-    "@salesforce/sf-plugins-core": "^11.0.0",
-    "chalk": "^4.1.2",
-    "commander": "^9.5.0",
-    "dotenv": "^16.4.0",
-    "inquirer": "^8.2.6",
-    "jsforce": "^1.11.0",
-    "node-cron": "^3.0.3",
-    "nodemailer": "^6.9.0",
-    "ora": "^5.4.1",
-    "table": "^6.8.0",
-    "winston": "^3.11.0"
-  },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "jest": "^29.7.0",
-    "prettier": "^3.2.0"
+    "lerna": "^8.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "files": [
-    "bin/",
-    "src/",
-    "README.md",
-    "LICENSE"
-  ]
+  }
 }

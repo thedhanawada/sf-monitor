@@ -3,7 +3,7 @@
 const { Command } = require('commander');
 const chalk = require('chalk');
 const { version } = require('../package.json');
-const LimitsMonitor = require('../src/monitor');
+const LimitsMonitor = require('../src/cliMonitor');
 const ConfigManager = require('../src/config');
 
 const program = new Command();

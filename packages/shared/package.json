@@ -1,0 +1,27 @@
+{
+  "name": "@sf-monitor/shared",
+  "version": "1.5.0",
+  "description": "Shared utilities for sf-monitor CLI and VS Code extension",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "salesforce",
+    "governor-limits",
+    "monitoring"
+  ],
+  "author": "sf-monitor Contributors",
+  "license": "MIT",
+  "dependencies": {
+    "jsforce": "^1.11.0",
+    "winston": "^3.11.0",
+    "nodemailer": "^6.9.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

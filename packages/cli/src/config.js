@@ -3,7 +3,7 @@ const path = require('path');
 const os = require('os');
 const inquirer = require('inquirer');
 const chalk = require('chalk');
-const SFAuthManager = require('./sfauth');
+const { SFAuthManager } = require('@sf-monitor/shared');
 
 class ConfigManager {
   constructor() {
