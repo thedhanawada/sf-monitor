@@ -1,6 +1,6 @@
 {
   "name": "sf-monitor-vscode",
-  "displayName": "Salesforce Monitor",
+  "displayName": "sf-monitor",
   "description": "Real-time Salesforce governor limits monitoring for VS Code",
   "version": "1.5.4",
   "publisher": "sf-monitor",

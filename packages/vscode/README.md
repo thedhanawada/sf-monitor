@@ -1,4 +1,4 @@
-# SF Monitor - Salesforce Governor Limits Monitor
+# sf-monitor
 
 Real-time monitoring of Salesforce governor limits directly in VS Code. Track API usage, storage limits, and processing quotas while you develop.
 
