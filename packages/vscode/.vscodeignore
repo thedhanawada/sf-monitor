@@ -11,6 +11,4 @@ vsc-extension-quickstart.md
 node_modules/**
 webpack.config.js
 .vscodeignore
-.claude/**
-../../node_modules/**
-../../.claude/**
+../../**

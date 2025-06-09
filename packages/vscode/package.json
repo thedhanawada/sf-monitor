@@ -29,7 +29,7 @@
     "onCommand:sfMonitor.setup",
     "onStartupFinished"
   ],
-  "main": "./src/extension.js",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {

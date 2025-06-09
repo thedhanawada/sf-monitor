@@ -104,15 +104,26 @@ npm test
 
 ### VS Code Extension Development
 ```bash
-# Compile extension
-npm run vscode:compile
+# Open extension in VS Code
+cd packages/vscode
+code .
 
-# Watch for changes
-npm run vscode:watch
-
-# Package extension
-npm run vscode:package
+# Press F5 in VS Code to launch Extension Development Host
+# OR manually compile and package:
+npm run compile
+vsce package
+code --install-extension sf-monitor-vscode-1.5.0.vsix
 ```
+
+#### Testing the Extension
+1. Open `packages/vscode` folder in VS Code
+2. Press **F5** to launch Extension Development Host
+3. In the new window, use Command Palette (`Cmd+Shift+P`):
+   - `SF Monitor: Setup Org` - Configure org to monitor
+   - `SF Monitor: Refresh Limits` - Check current limits
+   - `SF Monitor: Start Monitoring` - Begin continuous monitoring
+4. Check Explorer panel for "SF Governor Limits" section
+5. Look for status bar indicator at bottom
 
 ## Architecture
 
