@@ -15,8 +15,12 @@
   "categories": [
     "Other",
     "Debuggers",
-    "Extension Packs"
+    "Testing"
   ],
+  "galleryBanner": {
+    "color": "#1e88e5",
+    "theme": "dark"
+  },
   "keywords": [
     "salesforce",
     "governor-limits",
