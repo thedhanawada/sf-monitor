@@ -1,0 +1,201 @@
+{
+  "name": "sf-monitor-vscode",
+  "displayName": "Salesforce Monitor",
+  "description": "Real-time Salesforce governor limits monitoring for VS Code",
+  "version": "1.5.0",
+  "publisher": "sf-monitor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thedhanawada/sf-monitor.git",
+    "directory": "packages/vscode"
+  },
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Debuggers",
+    "Extension Packs"
+  ],
+  "keywords": [
+    "salesforce",
+    "governor-limits",
+    "monitoring",
+    "apex",
+    "soql"
+  ],
+  "activationEvents": [
+    "onCommand:sfMonitor.refresh",
+    "onCommand:sfMonitor.setup",
+    "onStartupFinished"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "sfMonitor.refresh",
+        "title": "Refresh Limits",
+        "icon": "$(refresh)",
+        "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.setup",
+        "title": "Setup Org",
+        "icon": "$(gear)",
+        "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.startMonitoring",
+        "title": "Start Monitoring",
+        "icon": "$(play)",
+        "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.stopMonitoring",
+        "title": "Stop Monitoring",
+        "icon": "$(stop)",
+        "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.viewLimit",
+        "title": "View Limit Details",
+        "icon": "$(info)",
+        "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.openSettings",
+        "title": "Open Settings",
+        "icon": "$(settings-gear)",
+        "category": "SF Monitor"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "sfMonitorLimits",
+          "name": "SF Governor Limits",
+          "when": "sfMonitor.initialized"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "sfMonitor.refresh",
+          "when": "view == sfMonitorLimits",
+          "group": "navigation@1"
+        },
+        {
+          "command": "sfMonitor.setup",
+          "when": "view == sfMonitorLimits",
+          "group": "navigation@2"
+        },
+        {
+          "command": "sfMonitor.startMonitoring",
+          "when": "view == sfMonitorLimits && !sfMonitor.monitoring",
+          "group": "navigation@3"
+        },
+        {
+          "command": "sfMonitor.stopMonitoring",
+          "when": "view == sfMonitorLimits && sfMonitor.monitoring",
+          "group": "navigation@3"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "sfMonitor.viewLimit",
+          "when": "view == sfMonitorLimits && viewItem == limit",
+          "group": "inline"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "sfMonitor.refresh",
+          "when": "sfMonitor.initialized"
+        },
+        {
+          "command": "sfMonitor.setup"
+        },
+        {
+          "command": "sfMonitor.startMonitoring",
+          "when": "sfMonitor.initialized && !sfMonitor.monitoring"
+        },
+        {
+          "command": "sfMonitor.stopMonitoring",
+          "when": "sfMonitor.initialized && sfMonitor.monitoring"
+        },
+        {
+          "command": "sfMonitor.openSettings",
+          "when": "sfMonitor.initialized"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "SF Monitor",
+      "properties": {
+        "sfMonitor.defaultOrg": {
+          "type": "string",
+          "default": "",
+          "description": "Default Salesforce org to monitor"
+        },
+        "sfMonitor.monitoringInterval": {
+          "type": "number",
+          "default": 30,
+          "description": "Monitoring interval in seconds"
+        },
+        "sfMonitor.warningThreshold": {
+          "type": "number",
+          "default": 80,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Warning threshold percentage"
+        },
+        "sfMonitor.criticalThreshold": {
+          "type": "number",
+          "default": 95,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Critical threshold percentage"
+        },
+        "sfMonitor.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show status bar indicator"
+        },
+        "sfMonitor.notifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show VS Code notifications for alerts"
+        },
+        "sfMonitor.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Auto-refresh limits when files are saved"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js",
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "18.x",
+    "@vscode/test-electron": "^2.3.4",
+    "eslint": "^8.28.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "@sf-monitor/shared": "1.5.0"
+  }
+}
