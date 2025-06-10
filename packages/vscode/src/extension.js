@@ -4,11 +4,13 @@ const LimitsTreeProvider = require('./limitsTreeProvider');
 const StatusBarManager = require('./statusBarManager');
 const NotificationManager = require('./notificationManager');
 const DeploymentMonitorPanel = require('./deploymentMonitorPanel');
+const DeploymentDashboard = require('./deploymentDashboard');
 
 let limitsTreeProvider;
 let statusBarManager;
 let notificationManager;
 let deploymentPanel;
+let deploymentDashboard;
 let monitor;
 let sfAuth;
 let deploymentMonitor;
@@ -25,6 +27,7 @@ function activate(context) {
     statusBarManager = new StatusBarManager();
     notificationManager = new NotificationManager();
     deploymentPanel = new DeploymentMonitorPanel();
+    deploymentDashboard = new DeploymentDashboard();
 
     // Register tree data provider
     vscode.window.createTreeView('sfMonitorLimits', {
@@ -46,7 +49,10 @@ function activate(context) {
         vscode.commands.registerCommand('sfMonitor.openSettings', openSettings),
         vscode.commands.registerCommand('sfMonitor.startDeploymentMonitoring', startDeploymentMonitoring),
         vscode.commands.registerCommand('sfMonitor.stopDeployment', stopDeployment),
-        vscode.commands.registerCommand('sfMonitor.showDeploymentPanel', showDeploymentPanel)
+        vscode.commands.registerCommand('sfMonitor.showDeploymentPanel', showDeploymentPanel),
+        vscode.commands.registerCommand('sfMonitor.showDeploymentDashboard', showDeploymentDashboard),
+        vscode.commands.registerCommand('sfMonitor.refreshDeployments', refreshDeployments),
+        vscode.commands.registerCommand('sfMonitor.selectDeployment', selectDeployment)
     ];
 
     // Register event listeners
@@ -373,8 +379,13 @@ async function startDeploymentMonitoring() {
         // Parse command and arguments
         const [command, ...args] = deployCommand.split(' ');
 
+        // Auto-add target org if not specified
+        if (!args.includes('--target-org') && !args.includes('-o')) {
+            args.push('--target-org', defaultOrg);
+        }
+
         // Start monitoring the deployment
-        vscode.window.showInformationMessage('Starting deployment monitoring...');
+        vscode.window.showInformationMessage(`Starting deployment monitoring for ${defaultOrg}...`);
         
         await deploymentMonitor.interceptSFDeploy(command, args, {
             cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
@@ -444,6 +455,108 @@ function showDeploymentPanel() {
     deploymentPanel.show();
 }
 
+async function showDeploymentDashboard() {
+    try {
+        const config = vscode.workspace.getConfiguration('sfMonitor');
+        const defaultOrg = config.get('defaultOrg');
+
+        if (!defaultOrg) {
+            vscode.window.showErrorMessage('No default org configured. Run setup first.');
+            return;
+        }
+
+        // Initialize connection
+        const orgInfo = await sfAuth.getOrgInfo(defaultOrg);
+        await deploymentMonitor.connect(orgInfo);
+
+        // Show dashboard
+        deploymentDashboard.show();
+
+    } catch (error) {
+        console.error('Failed to show deployment dashboard:', error);
+        vscode.window.showErrorMessage(`Failed to show deployment dashboard: ${error.message}`);
+    }
+}
+
+async function refreshDeployments() {
+    try {
+        const config = vscode.workspace.getConfiguration('sfMonitor');
+        const defaultOrg = config.get('defaultOrg');
+
+        if (!defaultOrg) {
+            deploymentDashboard.setError('No default org configured');
+            return;
+        }
+
+        deploymentDashboard.setLoading(true);
+
+        // Get org info and fetch deployments
+        const orgInfo = await sfAuth.getOrgInfo(defaultOrg);
+        await deploymentMonitor.connect(orgInfo);
+        
+        const deployments = await deploymentMonitor.getAllActiveDeployments();
+        deploymentDashboard.updateDeployments(deployments);
+
+    } catch (error) {
+        console.error('Failed to refresh deployments:', error);
+        deploymentDashboard.setError(error.message);
+    } finally {
+        deploymentDashboard.setLoading(false);
+    }
+}
+
+async function selectDeployment(deploymentId) {
+    try {
+        deploymentDashboard.setLoading(true);
+
+        // Get detailed deployment info
+        const deploymentStatus = await deploymentMonitor.getDeploymentStatus(deploymentId);
+        
+        if (deploymentStatus) {
+            deploymentDashboard.updateSelectedDeployment(deploymentStatus);
+            
+            // Start monitoring this specific deployment if it's still active
+            if (!deploymentStatus.done) {
+                deploymentMonitor.deploymentId = deploymentId;
+                
+                // Start real-time monitoring for selected deployment
+                if (!deploymentMonitor.isMonitoring) {
+                    await deploymentMonitor.captureBaseline();
+                    deploymentMonitor.startRealTimeMonitoring();
+                    
+                    // Set up event listeners for real-time updates
+                    setupSelectedDeploymentEventListeners();
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error('Failed to select deployment:', error);
+        deploymentDashboard.setError(error.message);
+    } finally {
+        deploymentDashboard.setLoading(false);
+    }
+}
+
+function setupSelectedDeploymentEventListeners() {
+    // Remove existing listeners to avoid duplicates
+    deploymentMonitor.removeAllListeners(['monitoringUpdate', 'deploymentCompleted', 'deploymentFailed']);
+
+    deploymentMonitor.on('monitoringUpdate', (data) => {
+        deploymentDashboard.updateSelectedDeployment(data.deploymentStatus);
+    });
+
+    deploymentMonitor.on('deploymentCompleted', (data) => {
+        deploymentDashboard.updateSelectedDeployment({ ...data, done: true, success: true });
+        vscode.window.showInformationMessage(`Deployment ${data.deploymentId} completed successfully!`);
+    });
+
+    deploymentMonitor.on('deploymentFailed', (data) => {
+        deploymentDashboard.updateSelectedDeployment({ ...data, done: true, success: false });
+        vscode.window.showErrorMessage(`Deployment ${data.deploymentId} failed.`);
+    });
+}
+
 function deactivate() {
     if (monitoringInterval) {
         clearInterval(monitoringInterval);
@@ -453,6 +566,7 @@ function deactivate() {
     }
     statusBarManager.dispose();
     deploymentPanel.hide();
+    deploymentDashboard.hide();
 }
 
 module.exports = {

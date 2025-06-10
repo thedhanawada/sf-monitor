@@ -2,7 +2,7 @@
   "name": "sf-monitor-vscode",
   "displayName": "sf-monitor",
   "description": "Real-time Salesforce monitoring and deployment observability for VS Code",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "publisher": "sf-monitor",
   "icon": "media/icon.png",
   "repository": {
@@ -90,6 +90,12 @@
         "title": "Stop Deployment",
         "icon": "$(stop-circle)",
         "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.showDeploymentDashboard",
+        "title": "Deployment Dashboard",
+        "icon": "$(dashboard)",
+        "category": "SF Monitor"
       }
     ],
     "views": {
@@ -160,6 +166,9 @@
         {
           "command": "sfMonitor.stopDeployment",
           "when": "sfMonitor.deploying"
+        },
+        {
+          "command": "sfMonitor.showDeploymentDashboard"
         }
       ]
     },
