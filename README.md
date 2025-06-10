@@ -1,12 +1,32 @@
 # sf-monitor
 
-Salesforce governor limits monitoring toolkit. CLI tool and VS Code extension.
+Salesforce development observability platform. Real-time monitoring and deployment tracking for Salesforce orgs.
 
 ## Packages
 
-- `packages/cli` - npm package (`sf-monitor`)
-- `packages/vscode` - VS Code extension 
-- `packages/shared` - Common monitoring logic
+- `packages/cli` - CLI tool for terminal-based monitoring
+- `packages/vscode` - VS Code extension with UI components
+- `packages/shared` - Core monitoring logic using jsforce and SF CLI integration
+
+## Features
+
+### Continuous Org Monitoring
+- Real-time governor limits tracking via Salesforce Limits API
+- Configurable polling intervals and alert thresholds
+- Historical baseline comparison and trend analysis
+- Multi-org support with SF CLI authentication integration
+
+### Deployment Monitoring
+- SF CLI command interception and real-time deployment tracking
+- Metadata API polling for component deployment progress
+- Resource usage delta monitoring during deployments
+- Live deployment output capture and visualization
+
+### VS Code Integration
+- TreeView for org limits with status indicators
+- Webview panels for detailed metrics and deployment dashboards
+- Status bar integration and contextual notifications
+- Command palette integration for all monitoring functions
 
 ## CLI Usage
 
@@ -20,15 +40,39 @@ sf-monitor monitor --continuous
 
 ## VS Code Extension
 
-Install `.vsix` from releases or:
+Install from VS Code marketplace or package locally:
 
 ```bash
 cd packages/vscode
-code .
-# Press F5 to launch Extension Development Host
+npm run package-extension
+code --install-extension dist/sf-monitor-vscode-*.vsix
 ```
 
-Commands: `SF Monitor: Setup Org`, `SF Monitor: Refresh Limits`
+Available commands:
+- `SF Monitor: Setup Org` - Configure monitoring target
+- `SF Monitor: Start Deployment Monitoring` - Monitor SF CLI deployments
+- `SF Monitor: Show Deployment Panel` - Open deployment dashboard
+- `SF Monitor: Refresh Limits` - Manual org limits refresh
+
+## Technical Implementation
+
+### Core Monitoring
+- **Limits API**: `/services/data/v59.0/limits` endpoint polling
+- **Authentication**: SF CLI token extraction via `sf org display --json`
+- **Data Processing**: Real-time threshold analysis and alerting
+- **Event System**: EventEmitter-based monitoring updates
+
+### Deployment Tracking
+- **Command Interception**: Child process wrapping of SF CLI commands
+- **Metadata API**: `checkDeployStatus()` for deployment progress
+- **Baseline Capture**: Pre-deployment org state snapshot
+- **Delta Calculation**: Resource usage change tracking
+
+### VS Code Architecture
+- **Extension Host**: Node.js event loop integration
+- **Webview Messaging**: Bidirectional communication for live updates
+- **Configuration**: VS Code workspace settings integration
+- **Context Management**: VS Code command enablement based on state
 
 ## Development
 
@@ -38,25 +82,40 @@ cd sf-monitor
 npm install
 ```
 
-### CLI
+### CLI Development
 ```bash
 npm run cli:start
 ```
 
-### VS Code Extension  
+### VS Code Extension Development
 ```bash
 cd packages/vscode
 code .
-# Press F5
+# F5 to launch Extension Development Host
 ```
 
-## Architecture
+### Package Structure
+```
+sf-monitor/
+├── packages/
+│   ├── shared/         # Core monitoring logic
+│   │   ├── monitor.js      # Limits monitoring
+│   │   ├── deploymentMonitor.js  # Deployment tracking
+│   │   └── sfauth.js       # SF CLI integration
+│   ├── cli/            # CLI interface
+│   └── vscode/         # VS Code extension
+│       ├── src/
+│       │   ├── extension.js    # Main extension
+│       │   ├── deploymentMonitorPanel.js  # Deployment UI
+│       │   └── limitsTreeProvider.js      # TreeView data
+│       └── out/        # Webpack compiled output
+```
 
-- **Shared**: jsforce-based monitoring, SF CLI auth, alerting
-- **CLI**: Commander.js interface, file-based config
-- **VS Code**: TreeView, status bar, webview panels
+## Requirements
 
-Uses existing SF CLI authentication. Monitors API limits, storage, email, processing limits.
+- Node.js 18+
+- Salesforce CLI (`sf` or `sfdx`)
+- Authenticated Salesforce org access
 
 ## License
 
