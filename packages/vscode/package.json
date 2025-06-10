@@ -2,7 +2,7 @@
   "name": "sf-monitor-vscode",
   "displayName": "sf-monitor",
   "description": "Real-time Salesforce monitoring and deployment observability for VS Code",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "publisher": "sf-monitor",
   "icon": "media/icon.png",
   "repository": {
