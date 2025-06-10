@@ -12,5 +12,6 @@ webpack.config.js
 ../../LICENSE
 ../../README.md
 ../../.gitignore
+../../DEVELOPMENT.md
 ../cli/**
 ../shared/**
