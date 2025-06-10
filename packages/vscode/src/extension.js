@@ -1,14 +1,17 @@
 const vscode = require('vscode');
-const { LimitsMonitor, SFAuthManager } = require('@sf-monitor/shared');
+const { LimitsMonitor, SFAuthManager, DeploymentMonitor } = require('@sf-monitor/shared');
 const LimitsTreeProvider = require('./limitsTreeProvider');
 const StatusBarManager = require('./statusBarManager');
 const NotificationManager = require('./notificationManager');
+const DeploymentMonitorPanel = require('./deploymentMonitorPanel');
 
 let limitsTreeProvider;
 let statusBarManager;
 let notificationManager;
+let deploymentPanel;
 let monitor;
 let sfAuth;
+let deploymentMonitor;
 let monitoringInterval;
 
 function activate(context) {
@@ -17,9 +20,11 @@ function activate(context) {
     // Initialize components
     monitor = new LimitsMonitor();
     sfAuth = new SFAuthManager();
+    deploymentMonitor = new DeploymentMonitor();
     limitsTreeProvider = new LimitsTreeProvider();
     statusBarManager = new StatusBarManager();
     notificationManager = new NotificationManager();
+    deploymentPanel = new DeploymentMonitorPanel();
 
     // Register tree data provider
     vscode.window.createTreeView('sfMonitorLimits', {
@@ -38,7 +43,10 @@ function activate(context) {
         vscode.commands.registerCommand('sfMonitor.startMonitoring', startMonitoring),
         vscode.commands.registerCommand('sfMonitor.stopMonitoring', stopMonitoring),
         vscode.commands.registerCommand('sfMonitor.viewLimit', viewLimitDetails),
-        vscode.commands.registerCommand('sfMonitor.openSettings', openSettings)
+        vscode.commands.registerCommand('sfMonitor.openSettings', openSettings),
+        vscode.commands.registerCommand('sfMonitor.startDeploymentMonitoring', startDeploymentMonitoring),
+        vscode.commands.registerCommand('sfMonitor.stopDeployment', stopDeployment),
+        vscode.commands.registerCommand('sfMonitor.showDeploymentPanel', showDeploymentPanel)
     ];
 
     // Register event listeners
@@ -331,11 +339,120 @@ async function onDocumentSaved(document) {
     }
 }
 
+async function startDeploymentMonitoring() {
+    try {
+        const config = vscode.workspace.getConfiguration('sfMonitor');
+        const defaultOrg = config.get('defaultOrg');
+
+        if (!defaultOrg) {
+            vscode.window.showErrorMessage('No default org configured. Run setup first.');
+            return;
+        }
+
+        // Get org info
+        const orgInfo = await sfAuth.getOrgInfo(defaultOrg);
+        await deploymentMonitor.connect(orgInfo);
+
+        // Show deployment panel
+        deploymentPanel.show();
+
+        // Set up event listeners for deployment monitoring
+        setupDeploymentEventListeners();
+
+        // Prompt user to run SF CLI deploy command
+        const deployCommand = await vscode.window.showInputBox({
+            prompt: 'Enter SF CLI deploy command',
+            placeholder: 'sf project deploy start --source-dir force-app',
+            ignoreFocusOut: true
+        });
+
+        if (!deployCommand) {
+            return;
+        }
+
+        // Parse command and arguments
+        const [command, ...args] = deployCommand.split(' ');
+
+        // Start monitoring the deployment
+        vscode.window.showInformationMessage('Starting deployment monitoring...');
+        
+        await deploymentMonitor.interceptSFDeploy(command, args, {
+            cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath
+        });
+
+    } catch (error) {
+        console.error('Failed to start deployment monitoring:', error);
+        vscode.window.showErrorMessage(`Failed to start deployment monitoring: ${error.message}`);
+    }
+}
+
+function setupDeploymentEventListeners() {
+    deploymentMonitor.removeAllListeners(); // Clean up existing listeners
+
+    deploymentMonitor.on('deploymentStarted', (data) => {
+        deploymentPanel.setDeploymentStarted(data);
+        vscode.commands.executeCommand('setContext', 'sfMonitor.deploying', true);
+    });
+
+    deploymentMonitor.on('monitoringUpdate', (data) => {
+        deploymentPanel.updateDeploymentData(data);
+    });
+
+    deploymentMonitor.on('deploymentOutput', (data) => {
+        deploymentPanel.addOutputLine(data);
+    });
+
+    deploymentMonitor.on('deploymentCompleted', (data) => {
+        deploymentPanel.setDeploymentCompleted(data);
+        vscode.commands.executeCommand('setContext', 'sfMonitor.deploying', false);
+        vscode.window.showInformationMessage('Deployment completed successfully!');
+    });
+
+    deploymentMonitor.on('deploymentFailed', (data) => {
+        deploymentPanel.setDeploymentFailed(data);
+        vscode.commands.executeCommand('setContext', 'sfMonitor.deploying', false);
+        vscode.window.showErrorMessage('Deployment failed. Check the deployment panel for details.');
+    });
+
+    deploymentMonitor.on('deploymentError', (error) => {
+        vscode.commands.executeCommand('setContext', 'sfMonitor.deploying', false);
+        vscode.window.showErrorMessage(`Deployment error: ${error.message}`);
+    });
+
+    deploymentMonitor.on('baselineCaptured', (baseline) => {
+        console.log('Baseline captured:', baseline);
+    });
+
+    deploymentMonitor.on('error', (error) => {
+        console.error('Deployment monitor error:', error);
+        vscode.window.showWarningMessage(`Monitoring error: ${error.error}`);
+    });
+}
+
+function stopDeployment() {
+    try {
+        deploymentMonitor.stopMonitoring();
+        vscode.commands.executeCommand('setContext', 'sfMonitor.deploying', false);
+        vscode.window.showInformationMessage('Deployment monitoring stopped.');
+    } catch (error) {
+        console.error('Failed to stop deployment:', error);
+        vscode.window.showErrorMessage(`Failed to stop deployment: ${error.message}`);
+    }
+}
+
+function showDeploymentPanel() {
+    deploymentPanel.show();
+}
+
 function deactivate() {
     if (monitoringInterval) {
         clearInterval(monitoringInterval);
     }
+    if (deploymentMonitor) {
+        deploymentMonitor.stopMonitoring();
+    }
     statusBarManager.dispose();
+    deploymentPanel.hide();
 }
 
 module.exports = {

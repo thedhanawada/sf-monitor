@@ -1,8 +1,8 @@
 {
   "name": "sf-monitor-vscode",
   "displayName": "sf-monitor",
-  "description": "Real-time Salesforce governor limits monitoring for VS Code",
-  "version": "1.6.1",
+  "description": "Real-time Salesforce monitoring and deployment observability for VS Code",
+  "version": "1.7.0",
   "publisher": "sf-monitor",
   "icon": "media/icon.png",
   "repository": {
@@ -72,6 +72,24 @@
         "title": "Open Settings",
         "icon": "$(settings-gear)",
         "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.startDeploymentMonitoring",
+        "title": "Start Deployment Monitoring",
+        "icon": "$(rocket)",
+        "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.showDeploymentPanel",
+        "title": "Show Deployment Panel",
+        "icon": "$(dashboard)",
+        "category": "SF Monitor"
+      },
+      {
+        "command": "sfMonitor.stopDeployment",
+        "title": "Stop Deployment",
+        "icon": "$(stop-circle)",
+        "category": "SF Monitor"
       }
     ],
     "views": {
@@ -132,6 +150,16 @@
         {
           "command": "sfMonitor.openSettings",
           "when": "sfMonitor.initialized"
+        },
+        {
+          "command": "sfMonitor.startDeploymentMonitoring"
+        },
+        {
+          "command": "sfMonitor.showDeploymentPanel"
+        },
+        {
+          "command": "sfMonitor.stopDeployment",
+          "when": "sfMonitor.deploying"
         }
       ]
     },

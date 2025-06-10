@@ -13,5 +13,6 @@ webpack.config.js
 ../../README.md
 ../../.gitignore
 ../../DEVELOPMENT.md
+../../.claude/**
 ../cli/**
 ../shared/**
